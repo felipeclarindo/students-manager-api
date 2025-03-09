@@ -1,16 +1,16 @@
 package com.example.students_manager_api.model;
 
-import java.util.Date;
+import java.util.List;
 
 public class Student {
     private Long id;
     private String name;
-    private Date dateOfBirth;
+    private List<Number> notes;
 
-    public Student(Long id, String name, Date dateOfBirth) {
+    public Student(Long id, String name, List<Number> notes) {
         this.id = id;
         this.name = name;
-        this.dateOfBirth = dateOfBirth;
+        this.notes = notes;
     }
 
     public Long getId() {
@@ -20,8 +20,8 @@ public class Student {
     public String getName() {
         return name;
     }
-
-    public Date getDateOfbirth() {
-        return dateOfBirth;
+    
+    public List<Number> getNotes() {
+        return notes;
     }
 }

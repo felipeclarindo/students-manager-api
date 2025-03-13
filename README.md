@@ -20,7 +20,7 @@ cd students-manager-api
 
 3. Run the file `App.java` located in `src/main/java/com/example/students_manager_api/App.java`.
 
-4. Api is available in `localhost:8080`.
+4. API is available in `localhost:8080`.
 
 ## Contribution
 

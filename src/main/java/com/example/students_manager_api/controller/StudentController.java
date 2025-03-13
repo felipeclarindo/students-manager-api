@@ -12,20 +12,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.students_manager_api.model.Student;
 
 @RestController
+@RequestMapping("/api/students")
 public class StudentController {
     
     private List<Student> repository = new ArrayList<>();
 
-    @GetMapping("/api/students")
+    @GetMapping
     public ResponseEntity<Object> getAll() {
         if (!repository.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
-
+    
             response.put("content", repository);
             response.put("message", "Students successfully found");
             return ResponseEntity.status(200).body(response);
@@ -35,8 +37,8 @@ public class StudentController {
         response.put("content", Collections.emptyList());
         return ResponseEntity.status(200).body(response);
     }
-
-    @PostMapping("/api/students") 
+    
+    @PostMapping
     public ResponseEntity<Object> create(@RequestBody Student student) {
         Map<String, Object> response = new HashMap<>();
 
@@ -51,9 +53,9 @@ public class StudentController {
         response.put("message", "Student successfully created");
         response.put("content", student);
         return ResponseEntity.status(201).body(response);
-}
+    }
 
-    @GetMapping("/api/students/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Object> getById(@PathVariable Long id) {
         System.out.println("Getting student with id: " + id);
             
@@ -71,5 +73,4 @@ public class StudentController {
         response.put("message", "Student not found");
         return ResponseEntity.status(404).body(response);
     }
-
 }

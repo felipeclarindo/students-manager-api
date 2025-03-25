@@ -57,6 +57,7 @@ public class StudentController {
         repository.add(student);
         response.put("message", "Student created with successfully.");
         response.put("content", student);
+      
         return ResponseEntity.status(201).body(response);
     }
 
@@ -70,8 +71,10 @@ public class StudentController {
 
         if (student.isPresent()) {
             Map<String, Object> response = new HashMap<>();
+
             response.put("message", "Student founded with successfully.");
             response.put("content", student);
+          
             return ResponseEntity.status(200).body(response); 
         }
         Map<String, Object> response = new HashMap<>();
@@ -115,5 +118,4 @@ public class StudentController {
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student with id " + id + " not founded.")
                 );
     }
-
 }

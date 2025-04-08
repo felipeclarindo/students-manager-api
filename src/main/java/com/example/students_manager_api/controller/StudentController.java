@@ -25,24 +25,19 @@ import com.example.students_manager_api.model.Student;
 @RestController
 @RequestMapping("/api/students")
 public class StudentController {
-    
     private List<Student> repository = new ArrayList<>();
 
     @GetMapping
     public ResponseEntity<Object> getAll() {
         if (!repository.isEmpty()) {
-            Map<String, Object> response = new HashMap<>();
-    
-            response.put("content", repository);
-            response.put("message", "Students founded with successfully.");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(repository);
         }
         Map<String, Object> response = new HashMap<>();
         response.put("message", "No students found.");
         response.put("content", Collections.emptyList());
         return ResponseEntity.status(200).body(response);
     }
-    
+
     @PostMapping
     public ResponseEntity<Object> create(@RequestBody Student student) {
         Map<String, Object> response = new HashMap<>();
@@ -64,10 +59,10 @@ public class StudentController {
     @GetMapping("{id}")
     public ResponseEntity<Object> getById(@PathVariable Long id) {
         System.out.println("Getting student with id: " + id);
-            
+
         Optional<Student> student = repository.stream()
-                    .filter(s -> s.getId().equals(id))
-                    .findFirst();
+                .filter(s -> s.getId().equals(id))
+                .findFirst();
 
         if (student.isPresent()) {
             Map<String, Object> response = new HashMap<>();
@@ -80,16 +75,14 @@ public class StudentController {
         return ResponseEntity.status(404).body(response);
     }
 
-    
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Object> destroy(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
         response.put("message", "Student deleted with suscessfully.");
-        
         repository.remove(getStudent(id));
-        
+      
         return ResponseEntity.status(200).body(response);
     }
 
@@ -113,7 +106,7 @@ public class StudentController {
                 .filter(c -> c.getId().equals(id))
                 .findFirst()
                 .orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student with id " + id + " not founded.")
-                );
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Student with id " + id + " not founded."));
     }
 }

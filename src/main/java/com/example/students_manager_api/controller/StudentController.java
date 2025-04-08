@@ -25,7 +25,6 @@ import com.example.students_manager_api.model.Student;
 @RestController
 @RequestMapping("/api/students")
 public class StudentController {
-
     private List<Student> repository = new ArrayList<>();
 
     @GetMapping
@@ -53,6 +52,7 @@ public class StudentController {
         repository.add(student);
         response.put("message", "Student created with successfully.");
         response.put("content", student);
+
         return ResponseEntity.status(201).body(response);
     }
 
@@ -68,7 +68,7 @@ public class StudentController {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Student founded with successfully.");
             response.put("content", student);
-            return ResponseEntity.status(200).body(response);
+            return ResponseEntity.status(200).body(response); 
         }
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Student not found.");
@@ -81,9 +81,8 @@ public class StudentController {
         Map<String, Object> response = new HashMap<>();
 
         response.put("message", "Student deleted with suscessfully.");
-
         repository.remove(getStudent(id));
-
+      
         return ResponseEntity.status(200).body(response);
     }
 
@@ -110,5 +109,4 @@ public class StudentController {
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 "Student with id " + id + " not founded."));
     }
-
 }

@@ -2,9 +2,14 @@ package com.example.students_manager_api.controller;
 
 import java.util.List;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.students_manager_api.model.Student;
+import com.example.students_manager_api.model.StudentFilter;
 import com.example.students_manager_api.repository.StudentRepository;
+import com.example.students_manager_api.specification.StudentEspecification;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,6 +55,15 @@ public class StudentController {
     public Student get(@PathVariable Long id) {
         log.info("Getting student with id: {}", id);
         return getStudent(id);
+    }
+
+    @GetMapping("/filter")
+    @Operation(summary = "Filter students", description = "Filter students based on the provided filters.", tags = {
+            "Students" }, responses = @ApiResponse(responseCode = "200", description = "Filtered students"))
+    public Page<Student> index(
+            @ParameterObject StudentFilter filter,
+            @PageableDefault(size = 10, direction = Direction.DESC) Pageable pageable) {
+        return repository.findAll(StudentEspecification.withFilters(filter), pageable);
     }
 
     @PostMapping

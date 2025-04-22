@@ -1,11 +1,14 @@
 package com.example.students_manager_api.model;
 
 import java.util.List;
-
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -35,6 +38,8 @@ public class Student {
     @Size(min = 3, max = 50, message = "Period must be between 3 and 50 characters.")
     private String period;
 
-    @NotBlank(message = "Notes are needed.")
-    private List<Number> notes;
+    @ElementCollection
+    @Column(name = "note", columnDefinition = "DOUBLE")
+    @CollectionTable(name = "student_notes", joinColumns = @JoinColumn(name = "student_id"))
+    private List<Double> notes;
 }

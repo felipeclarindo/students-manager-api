@@ -1,14 +1,11 @@
 package com.example.students_manager_api.controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,94 +18,74 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.students_manager_api.model.Student;
+import com.example.students_manager_api.repository.StudentRepository;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/students")
+@Slf4j
 public class StudentController {
 
-    private List<Student> repository = new ArrayList<>();
+    @Autowired
+    private StudentRepository repository;
 
     @GetMapping
-    public ResponseEntity<Object> getAll() {
-        if (!repository.isEmpty()) {
-            return ResponseEntity.ok(repository);
-        }
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "No students found.");
-        response.put("content", Collections.emptyList());
-        return ResponseEntity.status(200).body(response);
+    @Cacheable(value = "students")
+    @Operation(summary = "List all students", description = "List all students saved.", tags = { "Students" })
+    public List<Student> getAll() {
+        return repository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a student by ID", description = "Get a student based on the provided ID.", tags = {
+            "Students" }, responses = {
+                    @ApiResponse(responseCode = "200", description = "Student found"),
+                    @ApiResponse(responseCode = "404", description = "Student not found") })
+    public Student get(@PathVariable Long id) {
+        log.info("Getting student with id: {}", id);
+        return getStudent(id);
     }
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody Student student) {
-        Map<String, Object> response = new HashMap<>();
-
-        for (Student s : repository) {
-            if (s.getId().equals(student.getId())) {
-                response.put("message", "Student already exists.");
-                return ResponseEntity.status(409).body(response);
-            }
-        }
-
-        repository.add(student);
-        response.put("message", "Student created with successfully.");
-        response.put("content", student);
-        return ResponseEntity.status(201).body(response);
+    @CacheEvict(value = "students", allEntries = true)
+    @Operation(responses = @ApiResponse(responseCode = "201", description = "Student created successfully"), requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Student object to create"), tags = {
+            "Students" })
+    @ResponseStatus(HttpStatus.CREATED)
+    public Student create(@RequestBody @Valid Student student) {
+        log.info("Creating student: {}", student.getName());
+        return repository.save(student);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Object> getById(@PathVariable Long id) {
-        System.out.println("Getting student with id: " + id);
-
-        Optional<Student> student = repository.stream()
-                .filter(s -> s.getId().equals(id))
-                .findFirst();
-
-        if (student.isPresent()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Student founded with successfully.");
-            response.put("content", student);
-            return ResponseEntity.status(200).body(response);
-        }
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Student not found.");
-        return ResponseEntity.status(404).body(response);
-    }
-
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
+    @CacheEvict(value = "students", allEntries = true)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Object> destroy(@PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("message", "Student deleted with suscessfully.");
-
-        repository.remove(getStudent(id));
-
-        return ResponseEntity.status(200).body(response);
+    @Operation(summary = "Delete a student by ID", description = "Deletes a student based on the provided ID.", tags = {
+            "Students" })
+    public void destroy(@PathVariable Long id) {
+        log.info("Deleting student with id: {}", id);
+        repository.delete(getStudent(id));
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody Student student) {
-        Student existingStudent = getStudent(id);
-        repository.remove(existingStudent);
-
+    @PutMapping("/{id}")
+    @CacheEvict(value = "students", allEntries = true)
+    @Operation(summary = "Update a student by ID", description = "Updates an existing student based on the provided ID.", tags = {
+            "Students" }, responses = {
+                    @ApiResponse(responseCode = "200", description = "Student updated successfully"),
+                    @ApiResponse(responseCode = "404", description = "Student not found") }, requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Student object to update"))
+    public Student update(@PathVariable Long id, @RequestBody @Valid Student student) {
+        log.info("Updating student with id: {}", id);
+        getStudent(id);
         student.setId(id);
-        repository.add(student);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Student updated with successfully.");
-        response.put("content", student);
-
-        return ResponseEntity.status(200).body(response);
+        return repository.save(student);
     }
 
     private Student getStudent(Long id) {
-        return repository.stream()
-                .filter(c -> c.getId().equals(id))
-                .findFirst()
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                "Student with id " + id + " not founded."));
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Student with id " + id + " not found."));
     }
-
 }

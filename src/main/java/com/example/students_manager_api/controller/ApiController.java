@@ -1,29 +1,33 @@
 package com.example.students_manager_api.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.students_manager_api.model.ApiResponseDescription;
+
+import io.swagger.v3.oas.annotations.Operation;
+
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/api")
+@Slf4j
+@Cacheable(value = "apiDescription")
 public class ApiController {
-    
-    @GetMapping
-    public ResponseEntity<Object> index() {
-        Map<String, String> response = new HashMap<>();
-        
-        response.put("message", "Welcome to the Students Manager API");
-        response.put("status", "API is running");
-        response.put("description", "This API is a simple CRUD to manage students");
-        response.put("author", "Felipe Clarindo");
-        response.put("author-github", "https://github.com/felipeclarindo");
-        response.put("version", "1.0.0");
-        response.put("repository", "https://github.com/felipeclarindo/students-manager-api");
 
-        return ResponseEntity.status(200).body(response);
+    @GetMapping
+    @Operation(summary = "API description", description = "Get API description", tags = { "API" })
+    public ResponseEntity<Object> index() {
+        ApiResponseDescription apiDescription = new ApiResponseDescription();
+
+        apiDescription.setMessage("Welcome to the Students Manager API").setStatus("API is running")
+                .setDescription("This API is a simple CRUD to manage students.").setAuthor("Felipe Clarindo")
+                .setGithubAuthor("https://github.com/felipeclarindo").setVersion("1.0.0")
+                .setRepositoryUrl("https://github.com/felipeclarindo/students-manager-api");
+
+        return ResponseEntity.status(200).body(apiDescription);
     }
 }

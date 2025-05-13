@@ -44,16 +44,16 @@ public class StudentController {
 
     @GetMapping
     @Cacheable(value = "students")
-    @Operation(summary = "List all students", description = "List all students saved.", tags = { "Students" })
+    @Operation(summary = "List all students", description = "List all students saved.", tags = {"Students"})
     public List<Student> getAll() {
         return repository.findAll();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a student by ID", description = "Get a student based on the provided ID.", tags = {
-            "Students" }, responses = {
-                    @ApiResponse(responseCode = "200", description = "Student found"),
-                    @ApiResponse(responseCode = "404", description = "Student not found") })
+        "Students"}, responses = {
+        @ApiResponse(responseCode = "200", description = "Student found"),
+        @ApiResponse(responseCode = "404", description = "Student not found")})
     public Student get(@PathVariable Long id) {
         log.info("Getting student with id: {}", id);
         return getStudent(id);
@@ -61,7 +61,7 @@ public class StudentController {
 
     @GetMapping("/filter")
     @Operation(summary = "Filter students", description = "Filter students based on the provided filters.", tags = {
-            "Students" }, responses = @ApiResponse(responseCode = "200", description = "Filtered students"))
+        "Students"}, responses = @ApiResponse(responseCode = "200", description = "Filtered students"))
     public Page<Student> index(
             @ParameterObject StudentFilter filter,
             @PageableDefault(size = 10, direction = Direction.DESC) Pageable pageable) {
@@ -71,7 +71,7 @@ public class StudentController {
     @PostMapping
     @CacheEvict(value = "students", allEntries = true)
     @Operation(responses = @ApiResponse(responseCode = "201", description = "Student created successfully"), requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Student object to create"), tags = {
-            "Students" })
+        "Students"})
     @ResponseStatus(HttpStatus.CREATED)
     public Student create(@RequestBody @Valid Student student) {
         log.info("Creating student: {}", student.getName());
@@ -82,7 +82,7 @@ public class StudentController {
     @CacheEvict(value = "students", allEntries = true)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a student by ID", description = "Deletes a student based on the provided ID.", tags = {
-            "Students" })
+        "Students"})
     public void destroy(@PathVariable Long id) {
         log.info("Deleting student with id: {}", id);
         repository.delete(getStudent(id));
@@ -91,9 +91,9 @@ public class StudentController {
     @PutMapping("/{id}")
     @CacheEvict(value = "students", allEntries = true)
     @Operation(summary = "Update a student by ID", description = "Updates an existing student based on the provided ID.", tags = {
-            "Students" }, responses = {
-                    @ApiResponse(responseCode = "200", description = "Student updated successfully"),
-                    @ApiResponse(responseCode = "404", description = "Student not found") }, requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Student object to update"))
+        "Students"}, responses = {
+        @ApiResponse(responseCode = "200", description = "Student updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Student not found")}, requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Student object to update"))
     public Student update(@PathVariable Long id, @RequestBody @Valid Student student) {
         log.info("Updating student with id: {}", id);
         getStudent(id);
@@ -104,6 +104,6 @@ public class StudentController {
     private Student getStudent(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Student with id " + id + " not found."));
+                "Student with id " + id + " not found."));
     }
 }

@@ -11,6 +11,7 @@ import com.example.students_manager_api.model.StudentFilter;
 import jakarta.persistence.criteria.Predicate;
 
 public class StudentEspecification {
+
     public static Specification<Student> withFilters(StudentFilter filter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

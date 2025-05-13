@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ApiController {
 
     @GetMapping
-    @Operation(summary = "API description", description = "Get API description", tags = { "API" })
+    @Operation(summary = "API description", description = "Get API description", tags = {"API"})
     public ResponseEntity<Object> index() {
         ApiResponseDescription apiDescription = new ApiResponseDescription();
 

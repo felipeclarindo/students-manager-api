@@ -7,7 +7,11 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.example.students_manager_api.auth.model.User;
+import com.example.students_manager_api.auth.model.UserRole;
+import com.example.students_manager_api.auth.repository.UserRepository;
 import com.example.students_manager_api.model.Student;
 import com.example.students_manager_api.repository.StudentRepository;
 
@@ -17,6 +21,12 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private final Random random = new Random();
 
     @Override
@@ -25,6 +35,21 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     public void init() {
+
+        var joao = User.builder()
+                .email("joao@fiap.com.br")
+                .password(passwordEncoder.encode("12345"))
+                .role(UserRole.ADMIN)
+                .build();
+
+        var maria = User.builder()
+                .email("maria@fiap.com.br")
+                .password(passwordEncoder.encode("12345"))
+                .role(UserRole.USER)
+                .build();
+
+        userRepository.saveAll(List.of(joao, maria));
+
         var names = List.of(
                 "Felipe Clarindo", "Maria Silva", "João Oliveira", "Ana Souza", "Carlos Santos",
                 "Larissa Costa", "Pedro Martins", "Juliana Rocha", "Bruno Lima", "Amanda Teixeira");

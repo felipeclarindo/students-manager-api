@@ -26,25 +26,25 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/students/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/auth/users/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/login/**").permitAll()
-                .anyRequest().authenticated()
-                )
+                        .requestMatchers(HttpMethod.GET, "/api").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                        .requestMatchers("/api/dashboard/**").permitAll()
+                        .anyRequest().permitAll())
+                .httpBasic(Customizer.withDefaults())
+                .cors(Customizer.withDefaults())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
                 .build();
     }
 
     @Bean
-    CorsConfigurationSource corsConfig() {
-        var source = new UrlBasedCorsConfigurationSource();
+    CorsConfigurationSource cors() {
         var config = new CorsConfiguration();
-        config.setAllowedHeaders(List.of("*"));
         config.setAllowedOrigins(List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        config.setAllowCredentials(false); // ou true se for necessário
+        var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
